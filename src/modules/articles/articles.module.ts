@@ -1,12 +1,20 @@
 import { Module } from '@nestjs/common';
+import { HttpModule } from '@nestjs/axios';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ArticlesController } from './articles.controller';
 import { ArticleService } from './articles.service';
-import { Article } from './entity/article.entity';
+import { Chat } from '../chat/entity/chat.entity';
+import { User } from '../users/entity/users.entity';
+import { OpenAiModule } from '../openai/openai.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Article])],
+  imports: [
+    TypeOrmModule.forFeature([Chat, User]),
+    OpenAiModule,
+    HttpModule,
+  ],
   controllers: [ArticlesController],
-  providers: [ArticleService]
+  providers: [ArticleService],
+  exports: [ArticleService],
 })
 export class ArticlesModule {}
