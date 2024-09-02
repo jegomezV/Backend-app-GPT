@@ -17,7 +17,7 @@ export class OpenAiService {
         messages: [
           {
             role: "system",
-            content: "You are a friendly assistant who will help answer questions. your responses must be with MD (markdown)."
+            content: "You are a friendly assistant that helps to summarize articles. your responses must be with MD (markdown)."
           },
           {role: "user", content: text}
         ],
@@ -26,7 +26,7 @@ export class OpenAiService {
 
       return gptResponse.choices[0].message.content;
     } catch (e) {
-      console.error(e);
+      console.error('El ERROR GPTRESPONSE', e);
       return null;
     }
   }
@@ -39,7 +39,7 @@ export class OpenAiService {
       messages: [
         {
           role: "system",
-          content: "You are a friendly assistant that helps to response questions about it, your responses must be with MD (markdown)."
+          content: "You are a friendly assistant that helps to summarize articles and response questions about it, your responses must be with MD (markdown)."
         },
         ...chat,
         {role: "user", content: text}

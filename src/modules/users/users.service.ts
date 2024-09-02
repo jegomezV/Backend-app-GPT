@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entity/users.entity';
-import { CreateUserDto } from '../../common/dto/create-user.dto';
+import { CreateUserDto } from './dto/create-user.dto';
 import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
@@ -16,6 +16,10 @@ export class UsersService {
     return this.userRepository.findOne({
       where: { id },
     });
+  }
+
+  async findAll(): Promise<User[]> {
+    return this.userRepository.find();
   }
 
   async findByEmail(email: string): Promise<User | null> {
@@ -45,12 +49,12 @@ export class UsersService {
   }
 
   async resetPassword(user: User, newPassword: string): Promise<void> {
-    user.password = newPassword; // Ensure password is hashed
+    user.password = newPassword;
     await this.userRepository.save(user);
   }
 
   generateToken(): string {
-    return uuidv4(); // Generar un token único
+    return uuidv4();
   }
 
   async save(user: User): Promise<User> {

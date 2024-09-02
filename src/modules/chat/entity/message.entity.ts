@@ -9,8 +9,11 @@ export class Message {
   @Column()
   content: string;
 
-  @Column()
-  role: string;
+  @Column({
+    type: 'enum',
+    enum: ['system', 'user', 'assistant'],
+  })
+  role: 'system' | 'user' | 'assistant';
 
   @ManyToOne(() => Chat, chat => chat.messages)
   chat: Chat;

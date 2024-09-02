@@ -2,9 +2,9 @@ import { Controller, Post, Body, Res, HttpStatus, Param, Get, Put, Headers } fro
 import { Response } from 'express';
 import { UsersService } from './users.service';
 import { AuthService } from '../auth/auth.service';
-import { CreateUserDto } from '../../common/dto/create-user.dto';
-import { AuthenticateUserDto } from '../../common/dto/authenticate-user.dto';
-import { ResetPasswordDto } from '../../common/dto/reset-password.dto';
+import { CreateUserDto } from './dto/create-user.dto';
+import { AuthenticateUserDto } from '../auth/dto/authenticate-user.dto';
+import { ResetPasswordDto } from '../auth/dto/reset-password.dto';
 
 @Controller('users')
 export class UsersController {
@@ -12,6 +12,17 @@ export class UsersController {
     private readonly usersService: UsersService,
     private readonly authService: AuthService
   ) {}
+
+  @Get()
+  async findAll(@Res() res: Response) {
+    try {
+      const users = await this.usersService.findAll();
+      return res.json(users);
+    } catch (err) {
+      console.error('Error fetching users:', err);
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ msg: 'Something went wrong', error: true });
+    }
+  }
 
   @Post('register')
   async register(@Body() createUserDto: CreateUserDto, @Res() res: Response) {
@@ -24,10 +35,10 @@ export class UsersController {
   
     try {
       const user = await this.usersService.create(createUserDto);
-      const token = this.usersService.generateToken(); // Generar el token
-      user.token = token; // Asignar el token al usuario
-      await this.usersService.save(user); // Guardar el usuario con el token
-      await this.authService.sendRegistrationEmail(user); // Enviar el token en el correo electrónico
+      const token = this.usersService.generateToken();
+      user.token = token;
+      await this.usersService.save(user);
+      await this.authService.sendRegistrationEmail(user);
       return res.json({ msg: 'User created correctly, check your email to confirm the account', user });
     } catch (err) {
       console.error('Error creating user:', err);
@@ -71,10 +82,10 @@ export class UsersController {
 
   try {
     userConfirm.confirm = true;
-    userConfirm.token = ""; // Clear the token after confirmation
+    userConfirm.token = "";
     console.log("User confirmation status updated:", userConfirm);
 
-    await this.usersService.save(userConfirm); // Save the user with the updated confirmation status
+    await this.usersService.save(userConfirm);
     console.log("User saved successfully");
 
     return res.json({ msg: 'User confirmed correctly' });
@@ -135,3 +146,4 @@ export class UsersController {
     return res.status(HttpStatus.OK).json({ user });
   }
 }
+                                                                                                                                                            

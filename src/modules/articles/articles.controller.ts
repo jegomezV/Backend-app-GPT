@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Req, HttpException, HttpStatus } from '@nestjs/common';
+import { Controller, Post, Body, Req, HttpException, HttpStatus } from '@nestjs/common';
 import { ArticleService } from './articles.service';
 import { Chat } from '../chat/entity/chat.entity';
 import { User } from '../users/entity/users.entity';
@@ -41,9 +41,24 @@ export class ArticlesController {
       title: article.title ?? article.body.slice(0, 20),
     });
 
-    await this.chatRepository.save(chat);
+    console.log('CHAT CONTROLLER:', chat);
+    console.log('CHAT MESSAGES:', chat.messages);
+
+    try {
+      await this.chatRepository.save(chat);
+      
+      // Verificar que el chat se guardó correctamente
+      const savedChat = await this.chatRepository.findOneBy({ id: chat.id });
+      if (!savedChat) {
+        throw new Error('El chat no se guardó correctamente en la base de datos');
+      }
+    
+      console.log('Chat guardado correctamente:', savedChat);
+    } catch (error) {
+      console.error('Error al guardar el chat en la base de datos:', error);
+      throw new HttpException('No se pudo guardar el chat en la base de datos', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
 
     return chat;
   }
-  
 }
